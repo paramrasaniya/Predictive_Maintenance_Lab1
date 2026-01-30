@@ -1,7 +1,4 @@
-Below is a **clean, polished README** you can paste directly into `README.md`.
-It will render with **bold headings, clear spacing, icons, and neat sections** on GitHub.
 
-> Tip: In GitHub, headings are automatically bold. I also added emphasis where it improves readability.
 
 ````markdown
 # 🏭 **Linear Regression Architecture Workshop — Robot Failure Prediction (MLOps Ready)**
@@ -178,12 +175,7 @@ streamlit run dashboard/app.py
 
 ---
 
-## 👤 **Author**
 
-**Sumanth Reddy K**
-GitHub: `SumanthReddyKConestoga`
-
----
 
 ```
 
