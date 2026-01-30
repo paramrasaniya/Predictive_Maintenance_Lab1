@@ -1,0 +1,9 @@
+pandas==2.2.2
+numpy==2.0.1
+scikit-learn==1.5.1
+matplotlib==3.9.0
+PyYAML==6.0.2
+SQLAlchemy==2.0.32
+psycopg2-binary==2.9.9
+streamlit==1.37.1
+nbformat==5.10.4
