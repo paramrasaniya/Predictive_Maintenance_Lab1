@@ -222,24 +222,14 @@ Run these checks to confirm you’re “10/10-ready”:
 
 ---
 
-## 📌 Notes on Grading Alignment (Rubric Fit)
-
-This submission is designed to score highly because it demonstrates:
-
-* end-to-end pipeline thinking
-* live streaming + detection logic
-* database-backed persistence
-* dashboard visualization
-* clean documentation + reproducibility
-
 ---
 
-## 👤 Author
+## 
 
 **Sumanth Reddy K**
 Repository: `LinearRegressionWorkshop-1`
 Course: Workshop / Predictive Maintenance + Streaming Analytics
 
 ```
-::contentReference[oaicite:0]{index=0}
+
 ```
