@@ -1,90 +1,124 @@
+# 🤖 Robot Predictive Maintenance — Neon + Live Streaming Alerts + Dashboard
 
-**# 🤖 Robot Predictive Maintenance — Neon + Live Streaming Alerts + Dashboard (Workshop)#**
-
-> **Executive Intent:** Turn raw robot telemetry into **actionable predictive maintenance signals** — with **trained thresholds**, **live-stream visualization**, **event logging**, and a **dashboard** backed by **Neon Postgres**.
-
-This project builds a clean end-to-end workflow:  
-1) **Train models + learn thresholds** from historical robot data  
-2) **Stream live data** per robot and detect **ALERT / ERROR** events in real-time  
-3) Persist everything to **Neon** and visualize outcomes in a **dashboard**
+**Executive intent:** turn raw robot telemetry into **actionable predictive-maintenance signals** using  
+(1) **model training + learned thresholds**, (2) **live streaming detection**, and (3) a **dashboard** — all persisted in **Neon (Postgres)**.
 
 ---
 
-## 🧠 What Problem Are We Solving?
+## 🧠 Problem
 
-Industrial robots generate continuous sensor signals. Failures are expensive, disruptive, and often discovered too late.  
-This system watches live signals and raises early warnings:
+Industrial robots produce continuous sensor readings (current/axis signals). Failures are expensive and often detected late.  
+This project watches streaming signals and raises early warnings:
 
-- ⚠️ **ALERT** = abnormal behavior emerging (maintenance soon)
-- 🛑 **ERROR** = high-risk abnormality (maintenance urgent)
-
-The project follows a **predictive maintenance mindset**: detect abnormal trends early, log events, and make the system easy to operationalize.
+- ⚠️ **ALERT** → abnormal behavior emerging (schedule maintenance soon)
+- 🛑 **ERROR** → high-risk abnormality (urgent intervention)
 
 ---
 
-## ✅ Deliverables (What You Can Demo)
+## ✅ What You Can Demo (Deliverables)
 
-### ✅ Notebook 1 — Model Training + Threshold Learning (Neon)
-- Loads raw dataset
-- Prepares per-robot training sets
-- Fits **Linear Regression baseline**
-- Computes residual-based thresholds:
-  - `residual_alert`
-  - `residual_error`
-- Stores trained parameters + thresholds into Neon table: `linear_regression.models`
+### 1) Notebook: Training + Threshold Learning (Neon)
+File: `notebooks/01_train_models_thresholds_neon.ipynb`
 
-### ✅ Notebook 2 — Live Streaming + Alerting + Events Log (Neon)
-- Streams recent points for each robot (fast + smooth)
-- Shows 4 plots (one per robot)  
-- Displays:
-  - Observed waveform
-  - Smoothed waveform
-  - Regression baseline
-  - Threshold reference bands
-  - Symbol markers for **ALERT** and **ERROR**
-- Saves events to:
-  - `experiments/events.log`
-  - `linear_regression.events` table in Neon
+What it does:
+- Load historical robot dataset
+- Fit a **Linear Regression baseline** (per robot / per signal)
+- Compute residual-based thresholds:
+  - `residual_alert` (early warning)
+  - `residual_error` (critical)
+- Save trained params + thresholds into Neon: `linear_regression.models`
 
-### ✅ Dashboard (Streamlit)
-- Pulls latest stream + events from Neon
-- Shows per-robot panels
-- Summarizes events in a lookback window
-- Enables quick “operator view” monitoring
+### 2) Notebook: Live Streaming + Alerts + Event Logging (Neon)
+File: `notebooks/02_streaming_alerts_dashboard_neon.ipynb`
+
+What it does:
+- Stream recent points per robot (smooth + readable)
+- Plot per-robot panels:
+  - observed signal
+  - smoothed signal
+  - regression baseline
+  - threshold bands
+  - ⚠️ / 🛑 markers when events trigger
+- Save events to:
+  - `experiments/events.log` (local audit log)
+  - `linear_regression.events` (Neon table)
+
+### 3) Dashboard (Streamlit)
+File: `dashboard/app.py`
+
+What it does:
+- Pull latest stream + events from Neon
+- Show per-robot “operator view”
+- Summarize events over a lookback window
 
 ---
 
 ## 🧱 Architecture (High-Level)
 
-**Raw CSV → Training pipeline → Models in Neon → Streaming detector → Events in Neon → Dashboard**
+**Raw CSV → training pipeline → models in Neon → streaming detector → events in Neon → dashboard**
 
-- **Data layer:** Raw CSV + Neon Postgres  
-- **Model layer:** Linear Regression baseline per robot  
-- **Detection layer:** Residual thresholding + cooldown to reduce spam  
-- **Observability layer:** events.log + events table + dashboard panels  
-
-This is intentionally designed like a real-world pipeline: modular, logged, and demo-ready.
+- **Data layer:** CSV + Neon Postgres (persistent, dashboard-ready)
+- **Model layer:** linear regression baseline (interpretable, fast)
+- **Detection layer:** residual thresholding + cooldown to reduce alert spam
+- **Observability:** events.log + Neon `events` table + dashboard panels
 
 ---
 
-## ⚙️ Environment Setup
+## 📁 Project Structure
 
-### 1) Create & activate virtual environment
+```text
+.
+├─ configs/
+├─ dashboard/
+│  └─ app.py
+├─ data/
+│  ├─ processed/
+│  │  └─ processed_robot_data.csv
+│  └─ raw/
+│     └─ RMBR4-2_export_test_with_robotids_*.csv
+├─ experiments/
+│  ├─ plots/
+│  │  ├─ robot_1_live.html
+│  │  ├─ robot_2_live.html
+│  │  ├─ robot_3_live.html
+│  │  └─ robot_4_live.html
+│  ├─ events_log.csv
+│  ├─ events_robot_1.csv
+│  ├─ events_robot_2.csv
+│  ├─ events_robot_3.csv
+│  ├─ events_robot_4.csv
+│  ├─ events.log
+│  └─ results.csv
+├─ notebooks/
+│  ├─ 01_train_models_thresholds_neon.ipynb
+│  ├─ 02_streaming_alerts_dashboard_neon.ipynb
+│  └─ Optional-Notebook(practise).ipynb
+├─ screenshots/
+├─ venv/                 # local virtual environment (don’t commit)
+├─ .flake8
+├─ .gitignore
+├─ README.md
+└─ requirements.txt
+```
+
+---
+
+## ⚙️ Setup
+
+### 1) Create & activate a virtual environment
 ```bash
 python -m venv .venv
 # Windows PowerShell
 .\.venv\Scripts\activate
-````
+```
 
 ### 2) Install dependencies
-
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 3) Configure Neon connection
-
-Create `.env` in the project root:
+Create a `.env` file in the project root:
 
 ```env
 PGHOST=xxxxx.neon.tech
@@ -100,136 +134,105 @@ PGSSLMODE=require
 ## ▶️ How to Run (Correct Order)
 
 ### Step 1 — Train models + save thresholds to Neon
+Run:
+- `notebooks/01_train_models_thresholds_neon.ipynb`
 
-Open and run:
+Expected:
+- ✅ `linear_regression.models` populated (typically 4 robots / 4 rows)
+- Threshold values visible in output tables/prints
 
-* `notebooks/01_train_models_thresholds_neon.ipynb`
+### Step 2 — Run streaming + generate events + save logs
+Run:
+- `notebooks/02_streaming_alerts_dashboard_neon.ipynb`
 
-Expected output:
+Expected:
+- 4 robot plots with baseline + threshold bands
+- ⚠️ and 🛑 markers appear when residual exceeds thresholds
+- `experiments/events.log` is written/updated
+- ✅ `linear_regression.events` populates as streaming runs
 
-* ✅ models saved into `linear_regression.models`
-* You should see 4 rows (robot 1–4)
+### Step 3 — Launch the Streamlit dashboard
 
----
+After you finish **Notebook 2** (it generates the latest streaming events/logs), start the dashboard from your project root:
 
-### Step 2 — Run live streaming + generate events + save logs
+**Windows (PowerShell / CMD):**
+```bash
+streamlit run dashboard\\app.py
+```
 
-Open and run:
-
-* `notebooks/02_streaming_alerts_dashboard_neon.ipynb`
-
-Expected output:
-
-* 4 live plots (Robot 1–4)
-* Visible threshold reference lines
-* ⚠️ + 🛑 symbols plotted when events occur
-* `experiments/events.log` filled with events
-* `linear_regression.events` populated
-
----
-
-### Step 3 — Launch the Dashboard
-
+**macOS / Linux:**
 ```bash
 streamlit run dashboard/app.py
 ```
 
-Expected output:
+Expected:
+- Robot panels + recent events summary pulled from Neon
+- A local URL like `http://localhost:8501`
 
-* Robot panels
-* Latest stream lookback
-* Event summaries pulled from Neon
-
----
-
-## 📌 Key Technical Design Choices (Why This Is “Engineer-Grade”)
-
-### ✅ Why Linear Regression baseline?
-
-It’s a strong baseline for workshop-grade predictive maintenance:
-
-* interpretable
-* fast
-* stable
-* easy to validate
-
-### ✅ Why residual-based thresholds?
-
-Residuals quantify deviation from expected behavior.
-Thresholds convert residual severity into actionable events:
-
-* `residual_alert` captures early abnormality
-* `residual_error` captures critical abnormality
-
-### ✅ Why cooldown logic?
-
-Streaming detectors can spam events. Cooldown enforces:
-
-* fewer duplicate alerts
-* better signal-to-noise ratio
-* cleaner operator experience
-
-### ✅ Why Neon DB?
-
-Because production-grade pipelines don’t keep data in notebook memory:
-
-* persistent storage
-* dashboard-ready
-* real operational flow
 
 ---
 
-## 📊 Outputs & Evidence
+## 🗃️ Database Tables (Neon)
 
-This project produces:
-
-* Live streaming plots per robot
-* Logged events (`events.log`)
-* Structured Neon tables:
-
-  * `training_points`
-  * `stream_points`
-  * `models`
-  * `events`
+Common tables used/created:
+- `linear_regression.models` → model coefficients + thresholds
+- `linear_regression.events` → alert/error events with timestamps
+- (optional in your implementation) `training_points`, `stream_points`
 
 ---
 
-## 🧪 Quality Checks (Before Submission)
+## 📌 Key Design Choices (and how to explain them)
 
-Run these checks to confirm you’re “10/10-ready”:
+### Why a Linear Regression baseline?
+- Interpretable and fast → perfect baseline for workshop-grade predictive maintenance
+- Easier to validate than complex models (clear “expected vs observed”)
 
-✅ **Database sanity**
+### Why residual-based thresholds?
+- Residual = **observed − expected**
+- Converts continuous deviation into actionable categories:
+  - `residual_alert` = early anomaly
+  - `residual_error` = critical anomaly
 
-* `models` table has 4 rows
-* `events` table gets populated after streaming
+### Why cooldown logic?
+- Streaming detectors can spam repeated alerts
+- Cooldown improves signal-to-noise and creates a cleaner operator experience
 
-✅ **Plot sanity**
-
-* Each robot shows:
-
-  * observed waveform
-  * regression baseline
-  * threshold reference
-  * ALERT/ERROR markers visible at least once
-
-✅ **Reproducibility**
-
-* Fresh clone + install + run works end-to-end
-
-✅ **Clean storytelling**
-
-* Notebook markdown explains what each step does (short, clear)
+### Why Neon DB?
+- Production-like persistence (not just notebook memory)
+- Enables dashboard queries and reproducible demos
 
 ---
 
+### 30-second overview
+- “This project turns robot sensor streams into predictive-maintenance alerts.”
+- “We learn thresholds from historical data, then apply them on streaming data in real time.”
+- “All models and events persist to Neon, and Streamlit shows an operator dashboard.”
+
+### Notebook 1 (Training + thresholds)
+- “This notebook fits a baseline model to learn what *normal* looks like.”
+- “Residual thresholds become our ALERT/ERROR rules and are stored in `linear_regression.models`.”
+
+### Notebook 2 (Streaming + alerts)
+- “Here we stream points and compare observed vs expected in real time.”
+- “When residual crosses the learned thresholds, we log ⚠️/🛑 events to both a file and Neon.”
+
+### Dashboard
+- “This is the operator view: it pulls the latest signals and events directly from Neon.”
+- “The key idea is end-to-end reproducibility: data → model → events → dashboard.”
+
 ---
 
-## 
+## ✅ Submission Checklist
 
-**Sumanth Reddy K**
-Repository: `LinearRegressionWorkshop-1`
-Course: Workshop / Predictive Maintenance + Streaming Analytics
+- [ ] Notebooks run end-to-end on a fresh machine after `pip install -r requirements.txt`
+- [ ] `.env` is present locally and **NOT committed**
+- [ ] `linear_regression.models` has rows after Notebook 1
+- [ ] `linear_regression.events` populates after Notebook 2 streaming
+- [ ] Dashboard launches and shows recent events
 
-```
+---
 
-```
+## Author
+
+**Param Avinashkumar Rasaniya**  
+Course: Predictive Maintenance / Streaming Analytics Workshop
