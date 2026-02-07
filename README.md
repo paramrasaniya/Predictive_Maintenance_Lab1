@@ -234,6 +234,6 @@ Common tables used/created:
 
 ## Author
 
-**Param Avinashkumar Rasaniya**
+**Param Avinashkumar Rasaniya,**
 **Student ID: 9086095**
 Course: Predictive Maintenance / Streaming Analytics Workshop
